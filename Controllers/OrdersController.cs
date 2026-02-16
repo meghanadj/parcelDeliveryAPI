@@ -50,10 +50,10 @@ public class OrdersController : ControllerBase
                              ? _classifier.ClassifyDepartment(p.Weight)
                              : Department.Insurance // default to Insurance for rejected/ pending parcels
             };
-        }).ToList()
-    };
+            }).ToList()
+        };
 
-            await _orderDao.CreateAsync(order);
+        await _orderDao.CreateAsync(order);
 
         return CreatedAtAction(nameof(CreateOrder), new { id = order.Id }, new {
             Message = "Order created",
@@ -63,4 +63,21 @@ public class OrdersController : ControllerBase
         });
     }
 
+    [HttpGet]
+    public async Task<IActionResult> GetAllOrders()
+    {
+        var orders = await _orderDao.ListAsync();
+        return Ok(orders);
+    }
+    [HttpGet("{id:guid}")]
+    public async Task<IActionResult> GetOrderById(Guid id)
+    {
+        var order = await _orderDao.GetByIdAsync(id);
+        if (order == null)
+        {
+            return NotFound(new { Message = "Order not found", OrderId = id });
+        }
+        return Ok(order);
+    }
+    
 }

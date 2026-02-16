@@ -8,6 +8,12 @@ using ParcelDelivery.Api.DAO;
 var builder = WebApplication.CreateBuilder(args);
 
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
+builder.Services.AddControllers()
+    .AddJsonOptions(options =>
+    {
+        options.JsonSerializerOptions.ReferenceHandler = System.Text.Json.Serialization.ReferenceHandler.Preserve;
+        options.JsonSerializerOptions.WriteIndented = true;
+    });
 
 
 // Add services to the container.
@@ -22,6 +28,7 @@ builder.Services.AddSingleton<IParcelClassifier, ParcelClassifier>();
 builder.Services.AddScoped<IApprovalClassifier, ApprovalClassifier>();
 // DAOs
 builder.Services.AddScoped<IOrderDao, OrderDao>();
+builder.Services.AddScoped<IParcelDao, ParcelDao>();
 
 var app = builder.Build();
 

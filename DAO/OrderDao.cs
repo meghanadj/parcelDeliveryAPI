@@ -28,13 +28,6 @@ public class OrderDao : IOrderDao
         return order;
     }
 
-    public async Task<Order?> GetByIdAsync(Guid id)
-    {
-        return await _db.Orders
-            .Include(o => o.Parcels)
-                .ThenInclude(p => p.Recipient)
-            .FirstOrDefaultAsync(o => o.Id == id);
-    }
 
     public async Task<List<Order>> ListAsync()
     {
@@ -42,5 +35,13 @@ public class OrderDao : IOrderDao
             .Include(o => o.Parcels)
                 .ThenInclude(p => p.Recipient)
             .ToListAsync();
+    }
+
+    public async Task<Order?> GetByIdAsync(Guid id)
+    {
+        return await _db.Orders
+            .Include(o => o.Parcels)
+                .ThenInclude(p => p.Recipient)
+            .FirstOrDefaultAsync(o => o.Id == id);
     }
 }
