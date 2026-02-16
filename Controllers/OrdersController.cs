@@ -11,11 +11,12 @@ public class OrdersController : ControllerBase
 {
     private readonly IOrderDao _orderDao;
     private readonly IParcelClassifier _classifier;
-
-    public OrdersController(IOrderDao orderDao, IParcelClassifier classifier)
+    private readonly IApprovalClassifier _approvalClassifier;
+    public OrdersController(IOrderDao orderDao, IParcelClassifier classifier, IApprovalClassifier approvalClassifier)
     {
         _orderDao = orderDao;
         _classifier = classifier;
+        _approvalClassifier = approvalClassifier;
     }
 
     [HttpPost]
@@ -26,12 +27,17 @@ public class OrdersController : ControllerBase
             Id = Guid.NewGuid(),
             ShippingDate = request.ShippingDate,
             Type = request.Type,
-            Parcels = request.Parcels.Select(p => new Parcel
+            Parcels = request.Parcels.Select(p => 
+            {
+                var approvalStatus = _approvalClassifier.ClassifyApproval(p.Value);
+
+            return new Parcel
             {
                 Id = Guid.NewGuid(),
                 Weight = p.Weight,
                 Value = p.Value,
                 Content = p.Content,
+                Approved = approvalStatus, // set the approval status
                 Recipient = new Recipient
                 {
                     Id = Guid.NewGuid(),
@@ -39,9 +45,13 @@ public class OrdersController : ControllerBase
                     AddressJson = JsonSerializer.Serialize(p.RecipientAddress),
                     Phone = string.Empty
                 },
-                    Department = _classifier.ClassifyDepartment(p.Weight)
-            }).ToList()
-        };
+                // Assign department only if approved
+                Department = approvalStatus == ApprovalStatus.Approved
+                             ? _classifier.ClassifyDepartment(p.Weight)
+                             : Department.Insurance // default to Insurance for rejected/ pending parcels
+            };
+        }).ToList()
+    };
 
             await _orderDao.CreateAsync(order);
 

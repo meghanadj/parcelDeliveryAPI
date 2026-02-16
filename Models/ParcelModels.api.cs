@@ -5,6 +5,7 @@ public enum AddressType { Home, Office, Custom }
 public enum ContentType { Household, Electronics, Food, HouseholdItems }
 
 public enum Department { Mail = 0, Regular = 1, Heavy = 2 , Insurance = 3 }
+public enum ApprovalStatus { Rejected = 0, Approved = 1, Pending = 2 }
 
 public record City
 {
@@ -15,7 +16,6 @@ public record City
 
 public record Address
 {
-    public Guid Id { get; init; }
     public AddressType Type { get; init; }
     public string Street { get; init; } = default!;
     public string HouseNo { get; init; } = default!;
@@ -41,14 +41,14 @@ public class Parcel
     public double Weight { get; set; }
     public decimal Value { get; set; }
 
-    public bool Approved { get; set; } = true;
+    public ApprovalStatus Approved { get; set; } = ApprovalStatus.Pending;
 
 
     // foreign keys
     public Guid? RecipientId { get; set; }
     public Recipient? Recipient { get; set; }
 
-    public Department Department { get; set; } = Department.Regular;
+    public Department Department { get; set; } = Department.Insurance;
     public ContentType Content { get; set; }
 
     // relation to Order
