@@ -3,18 +3,13 @@ namespace ParcelDelivery.Api.Models;
 public enum Department { Mail = 0, Regular = 1, Heavy = 2 , Insurance = 3 }
 public enum ApprovalStatus { Rejected = 0, Approved = 1, Pending = 2 }
 
-public record City
-{
-    public string Name { get; init; } = default!;
-    public string Code { get; init; } = default!;
-    public int Pincode { get; init; }
-}
+
 
 public record Address
 {
     public string Street { get; init; } = default!;
     public string HouseNo { get; init; } = default!;
-    public City City { get; init; } = default!;
+    public string City { get; init; } = default!;
     public int Pincode { get; init; }
 
 }
