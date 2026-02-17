@@ -25,6 +25,7 @@ public class OrdersController : ControllerBase
         var order = new Order
         {
             Id = request.Id,
+            OrderNumber = request.OrderNumber,
             ShippingDate = request.ShippingDate,
             Parcels = request.Parcels.Select(p => 
             {

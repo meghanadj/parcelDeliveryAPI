@@ -49,6 +49,7 @@ public class Parcel
 public record Order
 {
     public int Id { get; init; }
+    public int OrderNumber {get; init;}
     public DateTime ShippingDate { get; init; }
     public List<Parcel> Parcels { get; init; } = new();
 }
