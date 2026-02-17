@@ -10,10 +10,19 @@ public class AppDbContext : DbContext
     public DbSet<Order> Orders => Set<Order>();
     public DbSet<Parcel> Parcels => Set<Parcel>();
     public DbSet<Recipient> Recipients => Set<Recipient>();
+    public DbSet<Department> Departments => Set<Department>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);
+
+        // Seed Departments
+        modelBuilder.Entity<Department>().HasData(
+            new Department { Id = 1, Name = "Mail", WeightLimit = 1.0 },
+            new Department { Id = 2, Name = "Regular", WeightLimit = 10.0 },
+            new Department { Id = 3, Name = "Heavy" }, // No limit implies > 10.0
+            new Department { Id = 4, Name = "Insurance" } // Manual assignment only
+        );
 
         // Parcels are now separate entities related to Order and Recipient
         modelBuilder.Entity<Order>()
@@ -27,7 +36,11 @@ public class AppDbContext : DbContext
             .WithMany(r => r.Parcels)
             .HasForeignKey(p => p.RecipientId)
             .OnDelete(DeleteBehavior.Restrict);
-
-        // no Department entity mapping anymore; Department is stored as enum on Parcel
+        
+        modelBuilder.Entity<Parcel>()
+            .HasOne(p => p.Department)
+            .WithMany()
+            .HasForeignKey(p => p.DepartmentId)
+            .OnDelete(DeleteBehavior.Restrict);
     }
 }

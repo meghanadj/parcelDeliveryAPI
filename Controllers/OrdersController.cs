@@ -22,16 +22,24 @@ public class OrdersController : ControllerBase
     [HttpPost]
     public async Task<IActionResult> CreateOrder([FromBody] OrderDTO request)
     {
-        var order = new Order
-        {
-            Id = request.Id,
-            OrderNumber = request.OrderNumber,
-            ShippingDate = request.ShippingDate,
-            Parcels = request.Parcels.Select(p => 
-            {
-                var approvalStatus = _approvalClassifier.ClassifyApproval(p.Value);
+        var parcelsList = new List<Parcel>();
+        var insuranceDept = await _classifier.GetDefaultDepartmentAsync();
 
-            return new Parcel
+        foreach (var p in request.Parcels)
+        {
+            var approvalStatus = _approvalClassifier.ClassifyApproval(p.Value);
+            Department dept;
+
+            if (approvalStatus == ApprovalStatus.Approved)
+            {
+                dept = await _classifier.ClassifyDepartment(p.Weight);
+            }
+            else
+            {
+                dept = insuranceDept;
+            }
+
+            var parcel = new Parcel
             {
                 Id = Guid.NewGuid(),
                 Weight = p.Weight,
@@ -44,12 +52,17 @@ public class OrdersController : ControllerBase
                     AddressJson = JsonSerializer.Serialize(p.RecipientAddress),
                     Phone = string.Empty
                 },
-                // Assign department only if approved
-                Department = approvalStatus == ApprovalStatus.Approved
-                             ? _classifier.ClassifyDepartment(p.Weight)
-                             : Department.Insurance // default to Insurance for rejected/ pending parcels
+                Department = dept
             };
-            }).ToList()
+            parcelsList.Add(parcel);
+        }
+
+        var order = new Order
+        {
+            Id = request.Id,
+            OrderNumber = request.OrderNumber,
+            ShippingDate = request.ShippingDate,
+            Parcels = parcelsList
         };
 
         await _orderDao.CreateAsync(order);

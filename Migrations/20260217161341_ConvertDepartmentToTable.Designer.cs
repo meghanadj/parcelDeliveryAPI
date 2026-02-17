@@ -12,8 +12,8 @@ using ParcelDelivery.Api.Data;
 namespace ParcelDelivery.Api.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20260217133620_addedOrderNumber")]
-    partial class addedOrderNumber
+    [Migration("20260217161341_ConvertDepartmentToTable")]
+    partial class ConvertDepartmentToTable
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -24,6 +24,50 @@ namespace ParcelDelivery.Api.Migrations
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
+
+            modelBuilder.Entity("ParcelDelivery.Api.Models.Department", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<double?>("WeightLimit")
+                        .HasColumnType("float");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Departments");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            Name = "Mail",
+                            WeightLimit = 1.0
+                        },
+                        new
+                        {
+                            Id = 2,
+                            Name = "Regular",
+                            WeightLimit = 10.0
+                        },
+                        new
+                        {
+                            Id = 3,
+                            Name = "Heavy"
+                        },
+                        new
+                        {
+                            Id = 4,
+                            Name = "Insurance"
+                        });
+                });
 
             modelBuilder.Entity("ParcelDelivery.Api.Models.Order", b =>
                 {
@@ -53,7 +97,7 @@ namespace ParcelDelivery.Api.Migrations
                     b.Property<int>("Approved")
                         .HasColumnType("int");
 
-                    b.Property<int>("Department")
+                    b.Property<int>("DepartmentId")
                         .HasColumnType("int");
 
                     b.Property<int?>("OrderId")
@@ -69,6 +113,8 @@ namespace ParcelDelivery.Api.Migrations
                         .HasColumnType("float");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("DepartmentId");
 
                     b.HasIndex("OrderId");
 
@@ -101,6 +147,12 @@ namespace ParcelDelivery.Api.Migrations
 
             modelBuilder.Entity("ParcelDelivery.Api.Models.Parcel", b =>
                 {
+                    b.HasOne("ParcelDelivery.Api.Models.Department", "Department")
+                        .WithMany()
+                        .HasForeignKey("DepartmentId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
                     b.HasOne("ParcelDelivery.Api.Models.Order", "Order")
                         .WithMany("Parcels")
                         .HasForeignKey("OrderId")
@@ -110,6 +162,8 @@ namespace ParcelDelivery.Api.Migrations
                         .WithMany("Parcels")
                         .HasForeignKey("RecipientId")
                         .OnDelete(DeleteBehavior.Restrict);
+
+                    b.Navigation("Department");
 
                     b.Navigation("Order");
 

@@ -4,6 +4,6 @@ namespace ParcelDelivery.Api.Interfaces;
 
 public interface IParcelClassifier
 {
-    Department ClassifyDepartment(double weightKg);
-    
+    Task<Department> ClassifyDepartment(double weightKg);
+    Task<Department> GetDefaultDepartmentAsync();
 }

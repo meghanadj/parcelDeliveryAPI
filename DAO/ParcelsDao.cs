@@ -13,6 +13,7 @@ public class ParcelDao : IParcelDao
     {
         return await _db.Parcels
             .Include(p => p.Recipient)
+            .Include(p => p.Department)
             .FirstOrDefaultAsync(p => p.Id == parcelId);
     }
 
@@ -25,6 +26,7 @@ public class ParcelDao : IParcelDao
     {
         return await _db.Parcels
             .Include(p => p.Recipient)
+            .Include(p => p.Department)
             .ToListAsync();
     }
 }

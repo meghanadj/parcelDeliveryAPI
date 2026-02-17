@@ -3,20 +3,37 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
+#pragma warning disable CA1814 // Prefer jagged arrays over multidimensional
+
 namespace ParcelDelivery.Api.Migrations
 {
     /// <inheritdoc />
-    public partial class InitialMigration : Migration
+    public partial class ConvertDepartmentToTable : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
+            migrationBuilder.CreateTable(
+                name: "Departments",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Name = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    WeightLimit = table.Column<double>(type: "float", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Departments", x => x.Id);
+                });
+
             migrationBuilder.CreateTable(
                 name: "Orders",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
+                    OrderNumber = table.Column<int>(type: "int", nullable: false),
                     ShippingDate = table.Column<DateTime>(type: "datetime2", nullable: false)
                 },
                 constraints: table =>
@@ -47,12 +64,18 @@ namespace ParcelDelivery.Api.Migrations
                     Value = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
                     Approved = table.Column<int>(type: "int", nullable: false),
                     RecipientId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
-                    Department = table.Column<int>(type: "int", nullable: false),
+                    DepartmentId = table.Column<int>(type: "int", nullable: false),
                     OrderId = table.Column<int>(type: "int", nullable: true)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Parcels", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Parcels_Departments_DepartmentId",
+                        column: x => x.DepartmentId,
+                        principalTable: "Departments",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
                         name: "FK_Parcels_Orders_OrderId",
                         column: x => x.OrderId,
@@ -66,6 +89,22 @@ namespace ParcelDelivery.Api.Migrations
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
                 });
+
+            migrationBuilder.InsertData(
+                table: "Departments",
+                columns: new[] { "Id", "Name", "WeightLimit" },
+                values: new object[,]
+                {
+                    { 1, "Mail", 1.0 },
+                    { 2, "Regular", 10.0 },
+                    { 3, "Heavy", null },
+                    { 4, "Insurance", null }
+                });
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Parcels_DepartmentId",
+                table: "Parcels",
+                column: "DepartmentId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Parcels_OrderId",
@@ -83,6 +122,9 @@ namespace ParcelDelivery.Api.Migrations
         {
             migrationBuilder.DropTable(
                 name: "Parcels");
+
+            migrationBuilder.DropTable(
+                name: "Departments");
 
             migrationBuilder.DropTable(
                 name: "Orders");

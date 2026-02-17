@@ -42,7 +42,7 @@ public class ParcelsController : ControllerBase
 
         if (parcel.Approved == ApprovalStatus.Approved)
         {
-            parcel.Department = _classifier.ClassifyDepartment(parcel.Weight);
+            parcel.Department = await _classifier.ClassifyDepartment(parcel.Weight);
         }
 
         await _parcelDao.UpdateParcelAsync(parcel);

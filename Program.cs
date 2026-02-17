@@ -34,7 +34,7 @@ builder.Services.AddOpenApi();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 // parcel classifier (business rules service)
-builder.Services.AddSingleton<IParcelClassifier, ParcelClassifier>();
+builder.Services.AddScoped<IParcelClassifier, ParcelClassifier>();
 builder.Services.AddScoped<IApprovalClassifier, ApprovalClassifier>();
 // DAOs
 builder.Services.AddScoped<IOrderDao, OrderDao>();

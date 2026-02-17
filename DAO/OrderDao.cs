@@ -34,6 +34,8 @@ public class OrderDao : IOrderDao
         return await _db.Orders
             .Include(o => o.Parcels)
                 .ThenInclude(p => p.Recipient)
+            .Include(o => o.Parcels)
+                .ThenInclude(p => p.Department)
             .ToListAsync();
     }
 
@@ -42,6 +44,8 @@ public class OrderDao : IOrderDao
         return await _db.Orders
             .Include(o => o.Parcels)
                 .ThenInclude(p => p.Recipient)
+            .Include(o => o.Parcels)
+                .ThenInclude(p => p.Department)
             .FirstOrDefaultAsync(o => o.Id == id);
     }
 }

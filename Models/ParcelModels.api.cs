@@ -1,6 +1,12 @@
 namespace ParcelDelivery.Api.Models;
 
-public enum Department { Mail = 0, Regular = 1, Heavy = 2 , Insurance = 3 }
+public class Department 
+{
+    public int Id { get; set; }
+    public string Name { get; set; } = string.Empty;
+    public double? WeightLimit { get; set; }
+}
+
 public enum ApprovalStatus { Rejected = 0, Approved = 1, Pending = 2 }
 
 
@@ -39,7 +45,8 @@ public class Parcel
     public Guid? RecipientId { get; set; }
     public Recipient? Recipient { get; set; }
 
-    public Department Department { get; set; } = Department.Insurance;
+    public int DepartmentId { get; set; } = 4; 
+    public Department? Department { get; set; }
 
     // relation to Order
     public int? OrderId { get; set; }
