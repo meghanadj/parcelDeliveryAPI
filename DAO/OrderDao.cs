@@ -37,7 +37,7 @@ public class OrderDao : IOrderDao
             .ToListAsync();
     }
 
-    public async Task<Order?> GetByIdAsync(Guid id)
+    public async Task<Order?> GetByIdAsync(int id)
     {
         return await _db.Orders
             .Include(o => o.Parcels)

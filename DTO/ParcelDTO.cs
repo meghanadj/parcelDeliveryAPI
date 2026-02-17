@@ -7,6 +7,5 @@ public record ParcelDTO(
     double Weight,
     decimal Value,
     string RecipientName,
-    Address RecipientAddress,
-    ContentType Content
-);
+    Address RecipientAddress
+    );

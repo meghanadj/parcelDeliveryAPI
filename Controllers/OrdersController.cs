@@ -24,9 +24,8 @@ public class OrdersController : ControllerBase
     {
         var order = new Order
         {
-            Id = Guid.NewGuid(),
+            Id = request.Id,
             ShippingDate = request.ShippingDate,
-            Type = request.Type,
             Parcels = request.Parcels.Select(p => 
             {
                 var approvalStatus = _approvalClassifier.ClassifyApproval(p.Value);
@@ -36,7 +35,6 @@ public class OrdersController : ControllerBase
                 Id = Guid.NewGuid(),
                 Weight = p.Weight,
                 Value = p.Value,
-                Content = p.Content,
                 Approved = approvalStatus, // set the approval status
                 Recipient = new Recipient
                 {
@@ -55,7 +53,7 @@ public class OrdersController : ControllerBase
 
         await _orderDao.CreateAsync(order);
 
-        return CreatedAtAction(nameof(CreateOrder), new { id = order.Id }, new {
+        return CreatedAtAction(nameof(GetOrderById), new { id = order.Id }, new {
             Message = "Order created",
             OrderId = order.Id,
             ParcelsCount = order.Parcels.Count,
@@ -69,8 +67,8 @@ public class OrdersController : ControllerBase
         var orders = await _orderDao.ListAsync();
         return Ok(orders);
     }
-    [HttpGet("{id:guid}")]
-    public async Task<IActionResult> GetOrderById(Guid id)
+    [HttpGet("{id:int}")]
+    public async Task<IActionResult> GetOrderById(int id)
     {
         var order = await _orderDao.GetByIdAsync(id);
         if (order == null)

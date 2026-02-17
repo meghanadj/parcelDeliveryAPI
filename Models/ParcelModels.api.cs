@@ -1,9 +1,5 @@
 namespace ParcelDelivery.Api.Models;
 
-public enum OrderType { International, Domestic }
-public enum AddressType { Home, Office, Custom }
-public enum ContentType { Household, Electronics, Food, HouseholdItems }
-
 public enum Department { Mail = 0, Regular = 1, Heavy = 2 , Insurance = 3 }
 public enum ApprovalStatus { Rejected = 0, Approved = 1, Pending = 2 }
 
@@ -16,11 +12,11 @@ public record City
 
 public record Address
 {
-    public AddressType Type { get; init; }
     public string Street { get; init; } = default!;
     public string HouseNo { get; init; } = default!;
     public City City { get; init; } = default!;
-    public string? CustomAddressType { get; init; }
+    public int Pincode { get; init; }
+
 }
 
 public class Recipient
@@ -49,17 +45,15 @@ public class Parcel
     public Recipient? Recipient { get; set; }
 
     public Department Department { get; set; } = Department.Insurance;
-    public ContentType Content { get; set; }
 
     // relation to Order
-    public Guid? OrderId { get; set; }
+    public int? OrderId { get; set; }
     public Order? Order { get; set; }
 }
 
 public record Order
 {
-    public Guid Id { get; init; }
+    public int Id { get; init; }
     public DateTime ShippingDate { get; init; }
-    public OrderType Type { get; init; }
     public List<Parcel> Parcels { get; init; } = new();
 }

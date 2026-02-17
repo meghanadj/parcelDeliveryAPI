@@ -24,15 +24,14 @@ namespace ParcelDelivery.Api.Migrations
 
             modelBuilder.Entity("ParcelDelivery.Api.Models.Order", b =>
                 {
-                    b.Property<Guid>("Id")
+                    b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<DateTime>("ShippingDate")
                         .HasColumnType("datetime2");
-
-                    b.Property<int>("Type")
-                        .HasColumnType("int");
 
                     b.HasKey("Id");
 
@@ -48,14 +47,11 @@ namespace ParcelDelivery.Api.Migrations
                     b.Property<int>("Approved")
                         .HasColumnType("int");
 
-                    b.Property<int>("Content")
-                        .HasColumnType("int");
-
                     b.Property<int>("Department")
                         .HasColumnType("int");
 
-                    b.Property<Guid?>("OrderId")
-                        .HasColumnType("uniqueidentifier");
+                    b.Property<int?>("OrderId")
+                        .HasColumnType("int");
 
                     b.Property<Guid?>("RecipientId")
                         .HasColumnType("uniqueidentifier");

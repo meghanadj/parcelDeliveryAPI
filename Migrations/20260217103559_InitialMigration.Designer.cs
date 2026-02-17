@@ -12,8 +12,8 @@ using ParcelDelivery.Api.Data;
 namespace ParcelDelivery.Api.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20260215120242_ConvertDepartmentToEntity")]
-    partial class ConvertDepartmentToEntity
+    [Migration("20260217103559_InitialMigration")]
+    partial class InitialMigration
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -25,49 +25,16 @@ namespace ParcelDelivery.Api.Migrations
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
-            modelBuilder.Entity("ParcelDelivery.Api.Models.Department", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("Departments");
-
-                    b.HasData(
-                        new
-                        {
-                            Id = new Guid("11111111-1111-1111-1111-111111111111"),
-                            Name = "Mail"
-                        },
-                        new
-                        {
-                            Id = new Guid("22222222-2222-2222-2222-222222222222"),
-                            Name = "Regular"
-                        },
-                        new
-                        {
-                            Id = new Guid("33333333-3333-3333-3333-333333333333"),
-                            Name = "Heavy"
-                        });
-                });
-
             modelBuilder.Entity("ParcelDelivery.Api.Models.Order", b =>
                 {
-                    b.Property<Guid>("Id")
+                    b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<DateTime>("ShippingDate")
                         .HasColumnType("datetime2");
-
-                    b.Property<int>("Type")
-                        .HasColumnType("int");
 
                     b.HasKey("Id");
 
@@ -80,14 +47,14 @@ namespace ParcelDelivery.Api.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<int>("Content")
+                    b.Property<int>("Approved")
                         .HasColumnType("int");
 
-                    b.Property<Guid?>("DepartmentId")
-                        .HasColumnType("uniqueidentifier");
+                    b.Property<int>("Department")
+                        .HasColumnType("int");
 
-                    b.Property<Guid?>("OrderId")
-                        .HasColumnType("uniqueidentifier");
+                    b.Property<int?>("OrderId")
+                        .HasColumnType("int");
 
                     b.Property<Guid?>("RecipientId")
                         .HasColumnType("uniqueidentifier");
@@ -99,8 +66,6 @@ namespace ParcelDelivery.Api.Migrations
                         .HasColumnType("float");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("DepartmentId");
 
                     b.HasIndex("OrderId");
 
@@ -133,11 +98,6 @@ namespace ParcelDelivery.Api.Migrations
 
             modelBuilder.Entity("ParcelDelivery.Api.Models.Parcel", b =>
                 {
-                    b.HasOne("ParcelDelivery.Api.Models.Department", "Department")
-                        .WithMany("Parcels")
-                        .HasForeignKey("DepartmentId")
-                        .OnDelete(DeleteBehavior.Restrict);
-
                     b.HasOne("ParcelDelivery.Api.Models.Order", "Order")
                         .WithMany("Parcels")
                         .HasForeignKey("OrderId")
@@ -148,16 +108,9 @@ namespace ParcelDelivery.Api.Migrations
                         .HasForeignKey("RecipientId")
                         .OnDelete(DeleteBehavior.Restrict);
 
-                    b.Navigation("Department");
-
                     b.Navigation("Order");
 
                     b.Navigation("Recipient");
-                });
-
-            modelBuilder.Entity("ParcelDelivery.Api.Models.Department", b =>
-                {
-                    b.Navigation("Parcels");
                 });
 
             modelBuilder.Entity("ParcelDelivery.Api.Models.Order", b =>
